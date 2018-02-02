@@ -2,7 +2,7 @@ import psycopg2
 from time import time
 
 class DB:
-    ## credentials, etc.
+    ## host, credentials, etc.
     __username=__password=__dbname=__host=__port   = None
 
     def __init__(self,username,password,dbname,host,port=5432,timeout=3600):
@@ -33,9 +33,12 @@ class DB:
         return self.execute(sql,params,False)
 
     def fetch_one(self,sql,params=()):
-        return self.execute(sql,params,False,1)
+        return self.execute(sql,params,False,False,1)
 
-    def execute(self,sql,params=(),execute=True,one=None):
+    def execute_out(self,sql,params=()):
+        return self.execute(sql,params,True,True)
+
+    def execute(self,sql,params=(),execute=True,out=False,one=None):
         try:
             if self.__close is True:
                 raise Exception("not connected")
@@ -48,6 +51,8 @@ class DB:
             cur.execute(sql , params)
 
             if execute is True:
+                if out is True:
+                    return cur.fetchone()[0]
                 return
 
             if one is not None:
