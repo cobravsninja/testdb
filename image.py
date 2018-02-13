@@ -20,6 +20,8 @@ def create_image_request_group(image_requests_part,image_requests_part_group,cha
     db.execute(query)
     query = "CREATE INDEX ON %s (keyword)" % image_requests_part_group
     db.execute(query)
+    query = "CREATE INDEX ON %s (chat_id)" % image_requests_part_group
+    db.execute(query)
 
 # images group part
 def create_images_part(images_part,chat_id,db):
@@ -31,6 +33,12 @@ def create_images_part(images_part,chat_id,db):
 def create_images_sub_part(images_part,images_part_subpart,keyword_n,db):
     query = "CREATE TABLE {} PARTITION OF {} FOR VALUES IN ('{}')".format(
             images_part_subpart,images_part,keyword_n)
+    db.execute(query)
+    query = "CREATE INDEX ON %s (chat_id)" % images_part_subpart
+    db.execute(query)
+    query = "CREATE INDEX ON %s (keyword_id)" % images_part_subpart
+    db.execute(query)
+    query = "CREATE INDEX ON %s (id)" % images_part_subpart
     db.execute(query)
 
 def insert_image_request(chat_id,keyword,db):
@@ -65,10 +73,6 @@ def insert_images(chat_id,keyword_id,keyword_n,nuran,db):
         create_images_sub_part(images_part,images_sub_part,keyword_n,db)
 
     for i in nuran:
-        query = "INSERT INTO images (keyword_id,url,type,chat_id,keyword_n) VALUES (%s,%s,b'%s',%s,%s)"
-        image_type = 0 if nuran[i]['type'] == 'jpg' else 1
+        query = "INSERT INTO images (keyword_id,url,type,chat_id,keyword_n) VALUES (%s,%s,%s,%s,%s)"
+        image_type = 'TRUE' if nuran[i]['type'] == u'jpg' else 'FALSE'
         db.execute(query,(keyword_id,nuran[i]['url'],image_type,chat_id,keyword_n,))
-
-#    images_part_subpart = images_part + str(len(keyword) % 10)
-#    if check_table(images_part_requested,db) is None:
-#        create_images_subpart(images_part_subpart)

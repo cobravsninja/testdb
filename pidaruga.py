@@ -9,11 +9,13 @@ import time
 import os
 import signal
 import db
+import time
 
 # telepot's msg loop & Bot
 from telepot.loop import MessageLoop
 from telepot import Bot 
 from handle_msg import handle_msg
+import asyncio
 
 # bot object
 bot = Bot(config.token)
@@ -28,6 +30,7 @@ def thread(fork_process,thread_queue,shared_dict):
     while 1:
         msg = thread_queue.get()
         print 'received msg from fork_process - {}, thread - {}, msg - {}'.format(fork_process,thread.getName(),msg,post)
+        print msg['text']
         handle_msg(msg,bot,shared_dict,post)
         #bot.sendMessage(data['from']['id'],data['text'])
 
@@ -58,4 +61,9 @@ for i in range(config.forks_qt):
     p.daemon = True
     p.start()
 
-MessageLoop(bot, handle).run_forever()
+#MessageLoop(bot, handle).run_forever()
+loop = asyncio.get_event_loop()
+#loop.create_task(MessageLoop(bot,handle).run_forever())
+#print('Listening ...')
+
+##loop.run_forever()
