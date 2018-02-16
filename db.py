@@ -22,7 +22,7 @@ class DB:
             self.__connect_time = time()
             self.__close = False
         except Exception as e:
-            print self.__host
+            print(self.__host)
             raise Exception(e)
 
     def close(self):
@@ -44,7 +44,7 @@ class DB:
                 raise Exception("not connected")
 
             if time() - self.__connect_time >= self.__timeout:
-                print 'reconnecting...'
+                print('reconnecting...')
                 self.close()
                 self.connect()
             cur = self.__connection.cursor()
